@@ -32,6 +32,12 @@ module Moonshine
       (configuration[:postgresql] && configuration[:postgresql][:version]) || '9.0'
     end
 
+    def postgresql_restart_on_change
+      restart_on_change = configuration[:postgresql][:restart_on_change]
+      restart_on_change = true if restart_on_change.nil? # treat nil as true, to be able to default
+      restart_on_change
+    end
+
 
     # Installs <tt>postgresql-9.x</tt> from apt and enables the <tt>postgresql</tt>
     # service.  Using a backports repo to get version 9.x:
@@ -43,11 +49,6 @@ module Moonshine
       exec 'add postgresql source list',
         :command => 'add-apt-repository ppa:pitti/postgresql',
         :creates => '/etc/apt/sources.list.d/pitti-postgresql-lucid.list',
-        :require => package('python-software-properties')
-
-      exec 'add ubuntu gis source list',
-        :command => 'add-apt-repository ppa:ubuntugis/ppa',
-        :creates => '/etc/apt/sources.list.d/ubuntugis-ppa-lucid.list',
         :require => package('python-software-properties')
 
       exec 'update sources',
@@ -70,6 +71,11 @@ module Moonshine
         :hasstatus  => true,
         :require    => package("postgresql-#{version}")
 
+      notifies = if postgresql_restart_on_change
+                   [service('postgresql')]
+                 else
+                   []
+                 end
       # ensure the postgresql key is present on the configuration hash
       file "/etc/postgresql/#{version}/main/pg_hba.conf",
         :ensure  => :present,
@@ -78,7 +84,7 @@ module Moonshine
         :mode    => '600',
         :owner   => 'postgres',
         :group   => 'postgres',
-        :notify  => service('postgresql')
+        :notify  => notifies
       file "/etc/postgresql/#{version}/main/postgresql.conf",
         :ensure  => :present,
         :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', 'postgresql.conf.erb'), binding),
@@ -86,7 +92,7 @@ module Moonshine
         :mode    => '600',
         :owner   => 'postgres',
         :group   => 'postgres',
-        :notify  => service('postgresql')
+        :notify  => notifies
     end
 
     # Install the <tt>pg</tt> rubygem and dependencies
@@ -101,8 +107,8 @@ module Moonshine
       psql "CREATE USER #{database_environment[:username]} WITH PASSWORD '#{database_environment[:password]}'",
         :alias    => "postgresql_user",
         :unless   => psql_query('\\\\du') + "| grep \"\\b#{database_environment[:username]}\\b\"",
-           :require  => service('postgresql')
-        end
+        :require  => service('postgresql')
+    end
 
     # Create the database from the current <tt>database_environment</tt>
     def postgresql_database
@@ -242,13 +248,18 @@ module Moonshine
 
     def postgresql_replication_standby
       version = postgresql_version
+      notifies = if postgresql_restart_on_change
+                   [service('postgresql')]
+                 else
+                   []
+                 end
       file '/var/lib/postgresql/recovery.conf',
         :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', 'recovery.conf.erb'), binding),
         :require => package("postgresql-#{version}"),
         :mode    => '600',
         :owner   => 'postgres',
         :group   => 'postgres',
-        :notify  => service('postgresql')
+        :notify  => notifies
 
       file "/var/lib/postgresql/#{version}/main/recovery.conf",
         :ensure => '/var/lib/postgresql/recovery.conf',
