@@ -38,12 +38,8 @@ module Moonshine
       restart_on_change
     end
 
-
-    # Installs <tt>postgresql-9.x</tt> from apt and enables the <tt>postgresql</tt>
-    # service.  Using a backports repo to get version 9.x:
-    # https://launchpad.net/~pitti/+archive/postgresql 
-    def postgresql_server(options = {})
-      version = postgresql_version
+    def postgresql_ppa
+      package 'python-software-properties', :ensure => :installed
 
       configure(:postgresql => HashWithIndifferentAccess.new)
       exec 'add postgresql source list',
@@ -55,17 +51,38 @@ module Moonshine
         :command      => 'apt-get update',
         :subscribe    => exec('add postgresql source list'),
         :refreshonly  => true
+    end
 
-      package 'python-software-properties', :ensure => :installed
+    def postgresql_client
+      recipe :postgresql_ppa
+      recipe :only_correct_postgres_version
+
+      package 'libpq-dev',
+        :ensure => :installed,
+        :require => exec('update sources'),
+        :before => exec('rails_gems')
+
+      package "postgresql-client-#{postgresql_version}",
+        :ensure => :installed,
+        :require => exec('update sources'),
+        :before => exec('rails_gems')
+    end
+
+
+    # Installs <tt>postgresql-9.x</tt> from apt and enables the <tt>postgresql</tt>
+    # service.  Using a backports repo to get version 9.x:
+    # https://launchpad.net/~pitti/+archive/postgresql 
+    def postgresql_server(options = {})
+      version = postgresql_version
+
+      recipe :postgresql_client
+
       package "postgresql-#{version}",
       :ensure => :installed,
         :require => exec('update sources')        
       package "postgresql-contrib-#{version}",
       :ensure => :installed,
         :require => exec('update sources')        
-      package 'libpq-dev',
-        :ensure => :installed,
-        :require => exec('update sources')
       service 'postgresql',
         :ensure     => :running,
         :hasstatus  => true,
@@ -271,9 +288,9 @@ module Moonshine
       %w(8.4 9.0 9.1 9.2).each do |version|
         if version != postgresql_version.to_s # need to_s, because YAML may think it's a float
           package "postgresql-#{version}", :ensure => :absent
-          package "postgresql-client-#{version}", :ensure => :absent
           package "postgresql-contrib-#{version}", :ensure => :absent
-          end
+          package "postgresql-client-#{version}", :ensure => :absent
+        end
       end
     end
 
