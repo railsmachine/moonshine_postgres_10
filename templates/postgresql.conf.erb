@@ -492,5 +492,5 @@ default_text_search_config = 'pg_catalog.english'
 #custom_variable_classes = ''		# list of custom variable class names
 
 <% if configuration[:postgresql][:shared_preload_libraries] %>shared_preload_libraries = '<%= configuration[:postgresql][:shared_preload_libraries] %>'<% end %>
-<% if configuration[:postgresql][:custom_variable_classes] %>custom_variable_classes = '<%= configuration[:postgresql][:custom_variable_classes] %>'<% end %>
+<% if configuration[:postgresql][:custom_variable_classes] && postgresql_supports_custom_variable_classes? %>custom_variable_classes = '<%= configuration[:postgresql][:custom_variable_classes] %>'<% end %>
 <% if configuration[:postgresql][:auto_explain_log_min_duration] %>auto_explain.log_min_duration = '<%= configuration[:postgresql][:auto_explain_log_min_duration] %>'<% end %>

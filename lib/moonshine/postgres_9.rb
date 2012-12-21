@@ -32,6 +32,11 @@ module Moonshine
       (configuration[:postgresql] && configuration[:postgresql][:version]) || '9.0'
     end
 
+    def postgresql_supports_custom_variable_classes?
+      postgresql_version <= '9.1'
+    end
+
+
     def postgresql_restart_on_change
       restart_on_change = configuration[:postgresql][:restart_on_change]
       restart_on_change = true if restart_on_change.nil? # treat nil as true, to be able to default
