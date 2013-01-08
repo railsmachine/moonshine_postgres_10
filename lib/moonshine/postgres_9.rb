@@ -120,7 +120,6 @@ module Moonshine
     # Install the <tt>pg</tt> rubygem and dependencies
     def postgresql_gem
       gem 'pg'
-      gem 'postgres'
     end
 
     # Grant the database user specified in the current <tt>database_environment</tt>
