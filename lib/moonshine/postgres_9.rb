@@ -293,7 +293,6 @@ module Moonshine
         if version != postgresql_version.to_s # need to_s, because YAML may think it's a float
           package "postgresql-#{version}", :ensure => :absent
           package "postgresql-contrib-#{version}", :ensure => :absent
-          package "postgresql-client-#{version}", :ensure => :absent
         end
       end
     end
