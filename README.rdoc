@@ -8,6 +8,8 @@ A plugin for installing and managing postgres_9.
 
 * <tt>script/plugin install git://github.com/railsmachine/moonshine_postgres_9.git</tt>
 * Configure settings if needed
-    configure(:postgres9 => {:foo => true})
-* Invoke the recipe(s) in your Moonshine manifest
-    recipe :postgres9
+    configure(:postgresql => {:version => '9.2'})
+* Add the following line near the top of your manifest:
+    include Moonshine::Postgres9
+    
+As long as you're using one of the standard moonshine stacks, like <code>:default_stack</code>, then the postgres 9 recipes will override the default Postgres recipes and install version 9.x instead.
