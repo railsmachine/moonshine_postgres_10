@@ -13,3 +13,9 @@ A plugin for installing and managing postgres_9.
     include Moonshine::Postgres9
     
 As long as you're using one of the standard moonshine stacks, like <code>:default_stack</code>, then the postgres 9 recipes will override the default Postgres recipes and install version 9.x instead.
+
+Moonshine Postgres9 enables SSL connections between the client and server. The
+server requires an SSL certificate and key to be placed at
+<code>$PGDATA/server.crt</cody> and <code>$PGDATA/server.key</code> respectively.
+The {PostgreSQL docs}(http://www.postgresql.org/docs/9.1/static/ssl-tcp.html)
+describe the steps to create a self-signed certificate.
