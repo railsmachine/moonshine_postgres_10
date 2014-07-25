@@ -78,6 +78,10 @@ unix_socket_directory = '/var/run/postgresql'		# (change requires restart)
 
 #authentication_timeout = 1min		# 1s-600s
 ssl = true				# (change requires restart)
+
+ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'         # (change requires restart)
+ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'                # (change requires restart)
+
 #ssl_ciphers = 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'	# allowed SSL ciphers
 					# (change requires restart)
 #password_encryption = on
