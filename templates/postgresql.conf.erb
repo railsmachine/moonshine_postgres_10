@@ -78,9 +78,8 @@ unix_socket_directory = '/var/run/postgresql'		# (change requires restart)
 
 #authentication_timeout = 1min		# 1s-600s
 ssl = true				# (change requires restart)
-
-ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'         # (change requires restart)
-ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'                # (change requires restart)
+ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'		# (change requires restart)
+ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'		# (change requires restart)
 
 #ssl_ciphers = 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'	# allowed SSL ciphers
 					# (change requires restart)
@@ -184,6 +183,12 @@ archive_command = '<%= configuration[:postgresql][:archive_command] || '/bin/tru
 archive_timeout = <%= configuration[:postgresql][:archive_timeout]	|| '0' %>	# force a logfile segment switch after this
 				# time; 0 is off
 
+
+# Timeouts
+
+max_standby_archive_delay = '<%= configuration[:postgresql][:max_standby_archive_delay] || "15min" %>'
+max_standby_streaming_delay = '<%= configuration[:postgresql][:max_standby_streaming_delay] || "15min" %>'
+hot_standby_feedback = <%= configuration[:postgresql][:hot_standby_feedback] || "on" %>
 
 #------------------------------------------------------------------------------
 # QUERY TUNING

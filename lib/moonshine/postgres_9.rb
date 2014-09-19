@@ -81,6 +81,7 @@ module Moonshine
       version = postgresql_version
 
       recipe :postgresql_client
+      recipe :postgresql_scripts
 
       package "postgresql-#{version}",
       :ensure => :installed,
@@ -255,6 +256,26 @@ module Moonshine
         :mode => '755',
         :owner => 'postgres',
         :group => 'postgres'
+    end
+
+    def postgresql_scripts
+    
+      file "/var/lib/postgresql/scripts",
+        :ensure => :directory,
+        :owner => 'postgres',
+        :require => package("postgresql-#{postgresql_version}")
+    
+      ["cp16mbonly", "pg_resync_replica", "promote_to_master", "wal_archive"].each do |f|
+      
+        file "/var/lib/postgresql/scripts/#{f}",
+          :ensure => :present,
+          :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', "#{f}.erb"), binding),
+          :owner => 'postgres',
+          :mode => '0755',
+          :require => file('/var/lib/postgresql/scripts')
+      
+      end
+     
     end
 
     def prune_pg_log
