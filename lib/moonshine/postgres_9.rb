@@ -249,7 +249,7 @@ module Moonshine
         :owner => 'postgres',
         :group => 'postgres'
 
-      file '/var/lib/postgresql/pitr-replication.conf',
+      file '/var/lib/postgresql/scripts/pitr-replication.conf',
         :require => package("postgresql-#{version}"),
         :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', 'pitr-replication.conf.erb'), binding),
         :ensure => :present,
