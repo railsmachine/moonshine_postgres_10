@@ -46,10 +46,37 @@ module Moonshine
     def postgresql_ppa
       package 'python-software-properties', :ensure => :installed
 
+      exec "add postgresql key",
+        :command => "wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -",
+        :require => package('python-software-properties'),
+        :unless => "sudo apt-key list | grep 'PostgreSQL Debian Repository'"
+
+      file "/etc/apt/sources.list.d/pitti-postgresql-lucid.list",
+        :ensure => :absent
+
       configure(:postgresql => HashWithIndifferentAccess.new)
+      
+      if ubuntu_precise?
+        repo = "precise"
+      elsif ubuntu_lucid?
+        repo = "lucid"
+      else
+        repo = "trusty"
+      end
+      
+      repo_path = "deb http://apt.postgresql.org/pub/repos/apt/ #{repo}-pgdg main"
+      
+      file '/etc/apt/preferences.d',
+        :ensure => :directory
+        
+      file '/etc/apt/preferences.d/postgresql',
+        :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', "preferences")),
+        :ensure => :present,
+        :require => [file("/etc/apt/preferences.d")]
+      
       exec 'add postgresql source list',
-        :command => 'add-apt-repository ppa:pitti/postgresql',
-        :creates => '/etc/apt/sources.list.d/pitti-postgresql-lucid.list',
+        :command => "add-apt-repository '#{repo_path}'",
+        :unless => "cat /etc/apt/sources.list | grep #{repo_path}",
         :require => package('python-software-properties')
 
       exec 'update sources',
@@ -310,7 +337,7 @@ module Moonshine
 
     # it's easy for other postgresql versions get installed. make sure they are uninstalled, and therefore not running
     def only_correct_postgres_version
-      %w(8.4 9.0 9.1 9.2).each do |version|
+      %w(8.4 9.0 9.1 9.2 9.3 9.4).each do |version|
         if version != postgresql_version.to_s # need to_s, because YAML may think it's a float
           package "postgresql-#{version}", :ensure => :absent
           package "postgresql-contrib-#{version}", :ensure => :absent
