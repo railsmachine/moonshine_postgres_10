@@ -45,6 +45,9 @@ module Moonshine
 
     def postgresql_ppa
       package 'python-software-properties', :ensure => :installed
+      if ubuntu_trusty?
+        package 'software-properties-common', :ensure => :installed
+      end
 
       exec "add postgresql key",
         :command => "wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -",
@@ -55,25 +58,25 @@ module Moonshine
         :ensure => :absent
 
       configure(:postgresql => HashWithIndifferentAccess.new)
-      
+
       if ubuntu_precise?
         repo = "precise"
       elsif ubuntu_lucid?
         repo = "lucid"
-      else
+      elsif ubuntu_trusty?
         repo = "trusty"
       end
-      
+
       repo_path = "deb http://apt.postgresql.org/pub/repos/apt/ #{repo}-pgdg main"
-      
+
       file '/etc/apt/preferences.d',
         :ensure => :directory
-        
+
       file '/etc/apt/preferences.d/postgresql',
         :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', "preferences")),
         :ensure => :present,
         :require => [file("/etc/apt/preferences.d")]
-      
+
       exec 'add postgresql source list',
         :command => "add-apt-repository '#{repo_path}'",
         :unless => "cat /etc/apt/sources.list | grep #{repo_path}",
@@ -103,7 +106,7 @@ module Moonshine
 
     # Installs <tt>postgresql-9.x</tt> from apt and enables the <tt>postgresql</tt>
     # service.  Using a backports repo to get version 9.x:
-    # https://launchpad.net/~pitti/+archive/postgresql 
+    # https://launchpad.net/~pitti/+archive/postgresql
     def postgresql_server(options = {})
       version = postgresql_version
 
@@ -112,10 +115,10 @@ module Moonshine
 
       package "postgresql-#{version}",
       :ensure => :installed,
-        :require => exec('update sources')        
+        :require => exec('update sources')
       package "postgresql-contrib-#{version}",
       :ensure => :installed,
-        :require => exec('update sources')        
+        :require => exec('update sources')
       service 'postgresql',
         :ensure     => :running,
         :hasstatus  => true,
@@ -286,23 +289,23 @@ module Moonshine
     end
 
     def postgresql_scripts
-    
+
       file "/var/lib/postgresql/scripts",
         :ensure => :directory,
         :owner => 'postgres',
         :require => package("postgresql-#{postgresql_version}")
-    
+
       ["cp16mbonly", "pg_resync_replica", "promote_to_master", "wal_archive"].each do |f|
-      
+
         file "/var/lib/postgresql/scripts/#{f}",
           :ensure => :present,
           :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', "#{f}.erb"), binding),
           :owner => 'postgres',
           :mode => '0755',
           :require => file('/var/lib/postgresql/scripts')
-      
+
       end
-     
+
     end
 
     def prune_pg_log
