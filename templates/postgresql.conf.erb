@@ -165,7 +165,11 @@ wal_keep_segments = <%= configuration[:postgresql][:wal_keep_segments] || '32' %
 					#   fsync_writethrough
 					#   open_sync
 #full_page_writes = on			# recover from partial page writes
+<% if configuration[:postgresql][:wall_buffers] %>
+wal_buffers = <%= configuration[:postgresql][:wal_buffers] %>
+<% else %>
 #wal_buffers = 64kB			# min 32kB
+<% end %>
 					# (change requires restart)
 #wal_writer_delay = 200ms		# 1-10000 milliseconds
 
@@ -230,7 +234,11 @@ effective_cache_size = <%= configuration[:postgresql][:effective_cache_size] || 
 
 # - Other Planner Options -
 
+<%= if configuration[:postgresql][:default_statistics_target] %>
+default_statistics_target = <%= configuration[:postgresql][:default_statistics_target] %>
+<% else %>
 #default_statistics_target = 10		# range 1-1000
+<% end %>
 #constraint_exclusion = off
 #from_collapse_limit = 8
 #join_collapse_limit = 8		# 1 disables collapsing of explicit 
