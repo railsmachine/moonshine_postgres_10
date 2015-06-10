@@ -234,7 +234,7 @@ effective_cache_size = <%= configuration[:postgresql][:effective_cache_size] || 
 
 # - Other Planner Options -
 
-<% if configuration[:postgresql][:default_statistics_target] %>
+<%= if configuration[:postgresql][:default_statistics_target] %>
 default_statistics_target = <%= configuration[:postgresql][:default_statistics_target] %>
 <% else %>
 #default_statistics_target = 10		# range 1-1000
@@ -515,3 +515,15 @@ default_text_search_config = 'pg_catalog.english'
 <% if configuration[:postgresql][:shared_preload_libraries] %>shared_preload_libraries = '<%= configuration[:postgresql][:shared_preload_libraries] %>'<% end %>
 <% if configuration[:postgresql][:custom_variable_classes] && postgresql_supports_custom_variable_classes? %>custom_variable_classes = '<%= configuration[:postgresql][:custom_variable_classes] %>'<% end %>
 <% if configuration[:postgresql][:auto_explain_log_min_duration] %>auto_explain.log_min_duration = '<%= configuration[:postgresql][:auto_explain_log_min_duration] %>'<% end %>
+
+<% if configuration[:postgresql][:pg_stat_statements_max] %>
+pg_stat_statements.max = '<%= configuration[:postgresql][:pg_stat_statements_max] %>'
+<% else %>
+#pg_stat_statements.max = 
+<% end %>
+
+<% if configuration[:postgresql][:pg_stat_statements_track] %>
+pg_stat_statements.track = '<%= configuration[:postgresql][:pg_stat_statements_track] %>'
+<% else %>
+#pg_stat_statements.track = 
+<% end %>
