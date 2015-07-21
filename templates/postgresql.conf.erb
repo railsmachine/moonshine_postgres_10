@@ -234,7 +234,7 @@ effective_cache_size = <%= configuration[:postgresql][:effective_cache_size] || 
 
 # - Other Planner Options -
 
-<%= if configuration[:postgresql][:default_statistics_target] %>
+<% if configuration[:postgresql][:default_statistics_target] %>
 default_statistics_target = <%= configuration[:postgresql][:default_statistics_target] %>
 <% else %>
 #default_statistics_target = 10		# range 1-1000
