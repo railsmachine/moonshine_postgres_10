@@ -44,11 +44,6 @@ module Moonshine
     end
 
     def postgresql_ppa
-      package 'python-software-properties', :ensure => :installed
-      if ubuntu_trusty?
-        package 'software-properties-common', :ensure => :installed
-      end
-
       exec "add postgresql key",
         :command => "wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -",
         :require => package('python-software-properties'),
