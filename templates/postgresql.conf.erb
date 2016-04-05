@@ -178,7 +178,12 @@ wal_buffers = <%= configuration[:postgresql][:wal_buffers] %>
 
 # - Checkpoints -
 
+<% if configuration[:postgresql][:version].to_f > 9.4 %>
+max_wal_size = <%= configuration[:postgresql][:max_wal_size] || '1GB' %>		# max size to let the WAL grow to between automatic WAL checkpoints
+min_wal_size = <%= configuration[:postgresql][:min_wal_size] || '80MB' %>		# used to ensure that enough WAL space is reserved to handle spikes in WAL usage
+<% else %>
 checkpoint_segments = <%= configuration[:postgresql][:checkpoint_segments] || '3' %>		# in logfile segments, min 1, 16MB each
+<% end %>
 checkpoint_timeout = <%= configuration[:postgresql][:checkpoint_timeout] || '5min' %>		# range 30s-1h
 checkpoint_completion_target = <%= configuration[:postgresql][:checkpoint_completion_target] || 0.5 %>	# checkpoint target duration, 0.0 - 1.0
 #checkpoint_warning = 30s		# 0 is off
