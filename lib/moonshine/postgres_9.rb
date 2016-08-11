@@ -348,7 +348,7 @@ module Moonshine
     def psql(query, options = {})
       name = options.delete(:alias) || "psql #{query}"
       hash = {
-        :command => psql_query(query),
+        :command => psql_query(query, options),
         :user => 'postgres'
       }.merge(options)
       exec(name,hash)
@@ -356,7 +356,7 @@ module Moonshine
 
     def psql_query(sql, options = {})
       if options && options[:dbname]
-        dbname = "--dbname #{options[:dbname]}"
+        dbname = "--dbname #{options.delete(:dbname)}"
       end
 
       "/usr/bin/psql -c \"#{sql}\" #{dbname}"
