@@ -335,7 +335,7 @@ module Moonshine
 
     # it's easy for other postgresql versions get installed. make sure they are uninstalled, and therefore not running
     def only_correct_postgres_version
-      %w(8.4 9.0 9.1 9.2 9.3 9.4).each do |version|
+      %w(8.4 9.0 9.1 9.2 9.3 9.4 9.5 9.6).each do |version|
         if version != postgresql_version.to_s # need to_s, because YAML may think it's a float
           package "postgresql-#{version}", :ensure => :absent
           package "postgresql-contrib-#{version}", :ensure => :absent
