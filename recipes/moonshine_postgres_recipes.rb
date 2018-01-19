@@ -1,5 +1,5 @@
 set :postgresql_version do
-  moonshine_yml[:postgresql][:version] || '9.0'
+  moonshine_yml[:postgresql][:version] || '10.1'
 end
 
 namespace :postgresql do

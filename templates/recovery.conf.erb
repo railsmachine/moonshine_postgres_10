@@ -1,11 +1,11 @@
 # restore with a simple copy
-restore_command = 'rsync -aq /var/lib/postgresql/9.2/main/pg_xlogarch/%f %p'
+restore_command = 'rsync -aq /var/lib/postgresql/10.1/main/pg_xlogarch/%f %p'
 
 # get WAL files from barman archive
 #restore_command = '/var/lib/postgresql/scripts/get_barman_wal.sh archiveserver1 /var/lib/barman/db1/wals %f %p'
 
 # delete unneeded archive files
-archive_cleanup_command = '/usr/lib/postgresql/9.2/bin/pg_archivecleanup /var/lib/postgresql/9.2/main/pg_xlogarch %r'
+archive_cleanup_command = '/usr/lib/postgresql/10.1/bin/pg_archivecleanup /var/lib/postgresql/10.1/main/pg_xlogarch %r'
 
 # become a standby..if 'off' don't wait for more xlogs
 standby_mode = 'on'

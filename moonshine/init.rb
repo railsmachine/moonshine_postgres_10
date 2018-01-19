@@ -1,1 +1,1 @@
-require File.dirname(__FILE__) + '/../lib/moonshine/postgres_9'
+require File.dirname(__FILE__) + '/../lib/moonshine/postgres_10'

@@ -1,5 +1,5 @@
 module Moonshine
-  module Postgres9
+  module Postgres10
 
     def self.included(manifest)
       manifest.class_eval do
@@ -29,13 +29,8 @@ module Moonshine
     end
 
     def postgresql_version
-      (configuration[:postgresql] && configuration[:postgresql][:version]) || '9.0'
+      (configuration[:postgresql] && configuration[:postgresql][:version]) || '10.0'
     end
-
-    def postgresql_supports_custom_variable_classes?
-      postgresql_version <= '9.1'
-    end
-
 
     def postgresql_restart_on_change
       restart_on_change = configuration[:postgresql][:restart_on_change]
@@ -99,8 +94,8 @@ module Moonshine
     end
 
 
-    # Installs <tt>postgresql-9.x</tt> from apt and enables the <tt>postgresql</tt>
-    # service.  Using a backports repo to get version 9.x:
+    # Installs <tt>postgresql-10.x</tt> from apt and enables the <tt>postgresql</tt>
+    # service.  Using a backports repo to get version 10.x:
     # https://launchpad.net/~pitti/+archive/postgresql
     def postgresql_server(options = {})
       version = postgresql_version
@@ -125,6 +120,13 @@ module Moonshine
                    []
                  end
       # ensure the postgresql key is present on the configuration hash
+      file "/usr/share/postgresql-common/init.d-functions",
+        :ensure => :present,
+        :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', 'init.d-functions.erb'), binding),
+	:mode    => '600',
+	:owner   => 'root',
+	:group   => 'root',
+	:notify  => notifies
       file "/etc/postgresql/#{version}/main/pg_hba.conf",
         :ensure  => :present,
         :content => template(File.join(File.dirname(__FILE__), '..', '..', 'templates', 'pg_hba.conf.erb'), binding),
@@ -335,7 +337,7 @@ module Moonshine
 
     # it's easy for other postgresql versions get installed. make sure they are uninstalled, and therefore not running
     def only_correct_postgres_version
-      %w(8.4 9.0 9.1 9.2 9.3 9.4 9.5 9.6).each do |version|
+      %w(9.6 10.0 10.1).each do |version|
         if version != postgresql_version.to_s # need to_s, because YAML may think it's a float
           package "postgresql-#{version}", :ensure => :absent
           package "postgresql-contrib-#{version}", :ensure => :absent

@@ -67,11 +67,7 @@ max_connections = <%= configuration[:postgresql][:max_connections] || 100 %>			#
 # connection slot, plus lock space (see max_locks_per_transaction).  You might
 # also need to raise shared_buffers to support more connections.
 #superuser_reserved_connections = 3	# (change requires restart)
-<% if configuration[:postgresql][:version].to_f > 9.2 %>
 unix_socket_directories = '/var/run/postgresql'		# (change requires restart)
-<% else %>
-unix_socket_directory = '/var/run/postgresql'		# (change requires restart)
-<% end %>
 #unix_socket_group = ''			# (change requires restart)
 #unix_socket_permissions = 0777		# begin with 0 to use octal notation
 					# (change requires restart)
@@ -178,12 +174,8 @@ wal_buffers = <%= configuration[:postgresql][:wal_buffers] %>
 
 # - Checkpoints -
 
-<% if configuration[:postgresql][:version].to_f > 9.4 %>
-max_wal_size = <%= configuration[:postgresql][:max_wal_size] || '1GB' %>		# max size to let the WAL grow to between automatic WAL checkpoints
-min_wal_size = <%= configuration[:postgresql][:min_wal_size] || '80MB' %>		# used to ensure that enough WAL space is reserved to handle spikes in WAL usage
-<% else %>
-checkpoint_segments = <%= configuration[:postgresql][:checkpoint_segments] || '3' %>		# in logfile segments, min 1, 16MB each
-<% end %>
+min_wal_size = <%= configuration[:postgresql][:min_wal_size]  || '80MB ' %>
+max_wal_size = <%= configuration[:postgresql][:max_wal_size]  || '1024MB' %>
 checkpoint_timeout = <%= configuration[:postgresql][:checkpoint_timeout] || '5min' %>		# range 30s-1h
 checkpoint_completion_target = <%= configuration[:postgresql][:checkpoint_completion_target] || 0.5 %>	# checkpoint target duration, 0.0 - 1.0
 #checkpoint_warning = 30s		# 0 is off
@@ -515,10 +507,8 @@ default_text_search_config = 'pg_catalog.english'
 # CUSTOMIZED OPTIONS
 #------------------------------------------------------------------------------
 
-#custom_variable_classes = ''		# list of custom variable class names
 
 <% if configuration[:postgresql][:shared_preload_libraries] %>shared_preload_libraries = '<%= configuration[:postgresql][:shared_preload_libraries] %>'<% end %>
-<% if configuration[:postgresql][:custom_variable_classes] && postgresql_supports_custom_variable_classes? %>custom_variable_classes = '<%= configuration[:postgresql][:custom_variable_classes] %>'<% end %>
 <% if configuration[:postgresql][:auto_explain_log_min_duration] %>auto_explain.log_min_duration = '<%= configuration[:postgresql][:auto_explain_log_min_duration] %>'<% end %>
 
 <% if configuration[:postgresql][:pg_stat_statements_max] %>

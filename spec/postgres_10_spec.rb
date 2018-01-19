@@ -3,8 +3,8 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 describe "A manifest with the Postgres84 plugin" do
 
   before do
-    @manifest = Postgres9Manifest.new
-    @manifest.postgres_9
+    @manifest = Postgres10Manifest.new
+    @manifest.postgres_10
   end
 
   it "should be executable" do
